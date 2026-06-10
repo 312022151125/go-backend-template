@@ -3,8 +3,8 @@ package cmd
 import (
 	"os"
 
-	"github.com/bestruirui/go-backend-template/internal/conf"
 	"github.com/spf13/cobra"
+	"go-backend-template/internal/conf"
 )
 
 var rootCmd = &cobra.Command{

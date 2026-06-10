@@ -4,28 +4,28 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/bestruirui/go-backend-template/internal/utils/log"
+	"github.com/charmbracelet/log"
 	"github.com/spf13/viper"
 )
 
 type Server struct {
-	Host string `json:"host"`
-	Port int    `json:"port"`
+	Host string `json:"host" mapstructure:"host"`
+	Port int    `json:"port" mapstructure:"port"`
 }
 
 type Log struct {
-	Level string `json:"level"`
+	Level string `json:"level" mapstructure:"level"`
 }
 
 type Database struct {
-	Type string `json:"type"`
-	Path string `json:"path"`
+	Type string `json:"type" mapstructure:"type"`
+	Path string `json:"path" mapstructure:"path"`
 }
 
 type Config struct {
-	Server   Server
-	Log      Log
-	Database Database
+	Server   Server   `mapstructure:"server"`
+	Log      Log      `mapstructure:"logging"`
+	Database Database `mapstructure:"database"`
 }
 
 var AppConfig Config
@@ -62,6 +62,11 @@ func Load(path string) error {
 
 	if err := viper.Unmarshal(&AppConfig); err != nil {
 		return fmt.Errorf("unable to decode config into struct: %w", err)
+	}
+	if level, err := log.ParseLevel(AppConfig.Log.Level); err == nil {
+		log.SetLevel(level)
+	} else {
+		return fmt.Errorf("invalid log level: %w", err)
 	}
 	return nil
 }

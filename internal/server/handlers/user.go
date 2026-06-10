@@ -2,13 +2,15 @@ package handlers
 
 import (
 	"net/http"
+	"time"
 
-	"github.com/bestruirui/go-backend-template/internal/model"
-	"github.com/bestruirui/go-backend-template/internal/op"
-	"github.com/bestruirui/go-backend-template/internal/server/auth"
-	"github.com/bestruirui/go-backend-template/internal/server/middleware"
-	"github.com/bestruirui/go-backend-template/internal/server/resp"
-	"github.com/bestruirui/go-backend-template/internal/server/router"
+	"go-backend-template/internal/model"
+	"go-backend-template/internal/server/middleware"
+	"go-backend-template/internal/server/resp"
+	"go-backend-template/internal/server/router"
+	"go-backend-template/internal/store"
+
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,6 +22,10 @@ func init() {
 		)
 	router.NewGroupRouter("/api/v1/user").
 		Use(middleware.Auth()).
+		AddRoute(
+			router.NewRoute("/logout", http.MethodPost).
+				Handle(logout),
+		).
 		AddRoute(
 			router.NewRoute("/change-password", http.MethodPost).
 				Handle(changePassword),
@@ -36,16 +42,44 @@ func login(c *gin.Context) {
 		resp.Error(c, http.StatusBadRequest, resp.ErrInvalidJSON)
 		return
 	}
-	if err := op.UserVerify(user.Username, user.Password); err != nil {
+	if err := store.UserVerify(user.Username, user.Password); err != nil {
 		resp.Error(c, http.StatusUnauthorized, resp.ErrUnauthorized)
 		return
 	}
-	token, expire, err := auth.GenerateToken(user.Expire)
-	if err != nil {
+	maxAge := int((15 * time.Minute).Seconds())
+	if user.Trust {
+		maxAge = int((30 * 24 * time.Hour).Seconds())
+	}
+	session := sessions.Default(c)
+	session.Set("authenticated", true)
+	session.Set("auth_version", store.UserAuthVersion())
+	session.Options(sessions.Options{
+		Path:     "/",
+		MaxAge:   maxAge,
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+	})
+	if err := session.Save(); err != nil {
 		resp.Error(c, http.StatusInternalServerError, resp.ErrInternalServer)
 		return
 	}
-	resp.Success(c, model.UserLoginResponse{Token: token, ExpireAt: expire})
+	resp.Success(c, "login successfully")
+}
+
+func logout(c *gin.Context) {
+	session := sessions.Default(c)
+	session.Clear()
+	session.Options(sessions.Options{
+		Path:     "/",
+		MaxAge:   -1,
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+	})
+	if err := session.Save(); err != nil {
+		resp.Error(c, http.StatusInternalServerError, resp.ErrInternalServer)
+		return
+	}
+	resp.Success(c, "logout successfully")
 }
 
 func changePassword(c *gin.Context) {
@@ -54,8 +88,20 @@ func changePassword(c *gin.Context) {
 		resp.Error(c, http.StatusBadRequest, resp.ErrInvalidJSON)
 		return
 	}
-	if err := op.UserChangePassword(user.OldPassword, user.NewPassword); err != nil {
+	if err := store.UserChangePassword(user.OldPassword, user.NewPassword); err != nil {
 		resp.Error(c, http.StatusInternalServerError, resp.ErrDatabase)
+		return
+	}
+	session := sessions.Default(c)
+	session.Clear()
+	session.Options(sessions.Options{
+		Path:     "/",
+		MaxAge:   -1,
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+	})
+	if err := session.Save(); err != nil {
+		resp.Error(c, http.StatusInternalServerError, resp.ErrInternalServer)
 		return
 	}
 	resp.Success(c, "password changed successfully")
@@ -67,8 +113,20 @@ func changeUsername(c *gin.Context) {
 		resp.Error(c, http.StatusBadRequest, resp.ErrInvalidJSON)
 		return
 	}
-	if err := op.UserChangeUsername(user.NewUsername); err != nil {
+	if err := store.UserChangeUsername(user.NewUsername); err != nil {
 		resp.Error(c, http.StatusInternalServerError, resp.ErrDatabase)
+		return
+	}
+	session := sessions.Default(c)
+	session.Clear()
+	session.Options(sessions.Options{
+		Path:     "/",
+		MaxAge:   -1,
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+	})
+	if err := session.Save(); err != nil {
+		resp.Error(c, http.StatusInternalServerError, resp.ErrInternalServer)
 		return
 	}
 	resp.Success(c, "username changed successfully")

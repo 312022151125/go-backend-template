@@ -7,10 +7,10 @@
 - [Gin](https://github.com/gin-gonic/gin)
 - [Viper](https://github.com/spf13/viper)
 - [Cobra](https://github.com/spf13/cobra)
-- [Zap](https://github.com/uber-go/zap)
+- [Charmbracelet/log](https://github.com/charmbracelet/log)
 - [SQLite](https://github.com/go-gorm/sqlite)
-- [JWT](https://github.com/golang-jwt/jwt)
 - [CORS](https://github.com/gin-contrib/cors)
+- Cookie Auth
 - Static 
 - Router
 - Shutdown

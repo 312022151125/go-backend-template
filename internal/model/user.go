@@ -2,23 +2,20 @@ package model
 
 import (
 	"fmt"
-	"time"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
-	ID        uint      `gorm:"primaryKey"`
-	Username  string    `gorm:"unique"`
-	Password  string    `gorm:"not null"`
-	CreatedAt time.Time `gorm:"autoCreateTime"`
-	UpdatedAt time.Time `gorm:"autoUpdateTime"`
+	ID       uint   `gorm:"primaryKey"`
+	Username string `gorm:"unique"`
+	Password string `gorm:"not null"`
 }
 
 type UserLogin struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
-	Expire   int    `json:"expire"`
+	Trust    bool   `json:"trust"`
 }
 
 type UserChangePassword struct {
@@ -28,11 +25,6 @@ type UserChangePassword struct {
 
 type UserChangeUsername struct {
 	NewUsername string `json:"new_username"`
-}
-
-type UserLoginResponse struct {
-	Token    string `json:"token"`
-	ExpireAt string `json:"expire_at"`
 }
 
 func (u *User) HashPassword() error {

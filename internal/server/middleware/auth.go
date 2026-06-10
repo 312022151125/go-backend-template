@@ -2,22 +2,26 @@ package middleware
 
 import (
 	"net/http"
-	"strings"
 
-	"github.com/bestruirui/go-backend-template/internal/server/auth"
-	"github.com/bestruirui/go-backend-template/internal/server/resp"
+	"go-backend-template/internal/server/resp"
+	"go-backend-template/internal/store"
+
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
 func Auth() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		token := c.GetHeader("Authorization")
-		if token == "" {
-			resp.Error(c, http.StatusBadRequest, resp.ErrBadRequest)
-			c.Abort()
-			return
-		}
-		if !auth.VerifyToken(strings.TrimPrefix(token, "Bearer ")) {
+		session := sessions.Default(c)
+		if session.Get("authenticated") != true || session.Get("auth_version") != store.UserAuthVersion() {
+			session.Clear()
+			session.Options(sessions.Options{
+				Path:     "/",
+				MaxAge:   -1,
+				HttpOnly: true,
+				SameSite: http.SameSiteLaxMode,
+			})
+			_ = session.Save()
 			resp.Error(c, http.StatusUnauthorized, resp.ErrUnauthorized)
 			c.Abort()
 			return

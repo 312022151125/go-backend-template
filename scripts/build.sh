@@ -22,10 +22,10 @@ readonly GIT_VERSION="$(git describe --tags --abbrev=0 2>/dev/null || echo 'dev'
 readonly COMMIT_ID="$(git rev-parse --short HEAD 2>/dev/null || echo 'unknown')"
 
 # Build flags
-readonly LDFLAGS="-X 'example/internal/conf.Version=${GIT_VERSION}' \
-                  -X 'example/internal/conf.BuildTime=${BUILD_TIME}' \
-                  -X 'example/internal/conf.Author=${GIT_AUTHOR}' \
-                  -X 'example/internal/conf.Commit=${COMMIT_ID}' \
+readonly LDFLAGS="-X 'go-backend-template/internal/conf.Version=${GIT_VERSION}' \
+                  -X 'go-backend-template/internal/conf.BuildTime=${BUILD_TIME}' \
+                  -X 'go-backend-template/internal/conf.Author=${GIT_AUTHOR}' \
+                  -X 'go-backend-template/internal/conf.Commit=${COMMIT_ID}' \
                   -s -w"
 
 # =============================================================================
