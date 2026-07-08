@@ -10,6 +10,7 @@ RUN apk add --no-cache alpine-conf ca-certificates su-exec && \
     mkdir -p /app
 
 COPY build/docker/${TARGETPLATFORM}/go-backend-template /app/go-backend-template
+COPY static /app/static
 COPY scripts/dockerfile/entrypoint.sh /entrypoint.sh
 
 RUN chmod +x /entrypoint.sh

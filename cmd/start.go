@@ -1,10 +1,12 @@
 package cmd
 
 import (
-	"fmt"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
+	"strings"
 	"syscall"
 
 	"github.com/312022151125/go-backend-template/internal/conf"
@@ -53,6 +55,19 @@ var startCmd = &cobra.Command{
 		r.Use(sessions.Sessions(conf.APP_NAME, cookieStore))
 
 		router.RegisterAll(r)
+		r.NoRoute(func(c *gin.Context) {
+			path := c.Request.URL.Path
+			if strings.HasPrefix(path, "/api") {
+				c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+				return
+			}
+			if c.Request.Method != http.MethodGet && c.Request.Method != http.MethodHead {
+				c.AbortWithStatus(http.StatusNotFound)
+				return
+			}
+			c.Header("Cache-Control", "no-cache")
+			c.File("static/index.html")
+		})
 
 		if err := store.InitDB(); err != nil {
 			log.Errorf("database init error: %v", err)
@@ -69,7 +84,7 @@ var startCmd = &cobra.Command{
 			return
 		}
 
-		addr := fmt.Sprintf("%s:%d", conf.AppConfig.Server.Host, conf.AppConfig.Server.Port)
+		addr := net.JoinHostPort(conf.AppConfig.Server.Host, strconv.Itoa(conf.AppConfig.Server.Port))
 		log.Infof("http server listening on http://%s", addr)
 		httpSrv := &http.Server{Addr: addr, Handler: r}
 

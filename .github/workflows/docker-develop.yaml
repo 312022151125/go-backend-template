@@ -32,8 +32,18 @@ jobs:
           go-version-file: go.mod
           cache: true
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
       - name: Test
         run: go test ./...
+
+      - name: Build web static
+        run: bash scripts/web-build.sh
 
       - name: Build Docker binaries
         run: bash scripts/build.sh docker-binaries --platform "${DOCKER_DEVELOP_PLATFORMS}"

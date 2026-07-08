@@ -1,2 +1,6 @@
 data
 build
+web/node_modules
+web/dist
+web/.vinxi
+web/.output

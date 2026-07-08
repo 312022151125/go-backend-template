@@ -515,6 +515,19 @@ main() {
             log_error "Failed to prepare build environment"
             exit 1
         fi
+        if ! command_exists npm; then
+            log_error "npm is required for release builds. Install Node.js or set SKIP_WEB_BUILD=1 to skip the web UI build."
+            exit 1
+        fi
+        if [[ "${SKIP_WEB_BUILD:-}" != "1" ]]; then
+            log_step "Building web static assets"
+            if ! bash "${MAIN_DIR}/scripts/web-build.sh"; then
+                log_error "Web static build failed"
+                exit 1
+            fi
+        else
+            log_warning "SKIP_WEB_BUILD=1: skipping web static build"
+        fi
 
         # Build for different platforms
         log_step "Building binaries"
