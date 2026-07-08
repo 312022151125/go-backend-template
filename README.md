@@ -22,3 +22,17 @@ The UI is a TanStack Start SPA in `web/`. Production assets are built into repo-
 - **Dev:** Terminal 1 — `go-backend-template start`. Terminal 2 — `cd web && bun run dev` (Vite proxies `/api` to `http://127.0.0.1:8080`).
 - **Prod build:** `bash scripts/web-build.sh` (`bun install --frozen-lockfile` + `bun run build` in `web/`)
 - **Auth:** Cookie login uses `fetch` with `credentials: 'include'`; use the Vite proxy in dev so the browser stays same-origin for `/api`.
+
+## Container images (GHCR)
+
+GitHub Actions push Alpine images to [GHCR](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry) as `ghcr.io/<owner>/<repo>:<tag>` (`IMAGE_NAME` = `${{ github.repository }}` in workflows):
+
+| Tag | When |
+|-----|------|
+| `:develop` | Push to `develop` |
+| `:latest` | Release |
+| `:<git-tag>` | Release |
+
+Example: `docker pull ghcr.io/312022151125/go-backend-template:develop`
+
+Uses `GITHUB_TOKEN` with `packages: write`. For private packages: `docker login ghcr.io` with a PAT (`read:packages`).

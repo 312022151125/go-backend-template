@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: write
+  packages: write
 
 jobs:
   build-release-and-docker:
@@ -16,11 +17,10 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success'
     env:
+      REGISTRY: ghcr.io
       GOFLAGS: -buildvcs=false
       RELEASE_LINUX_PLATFORMS: linux/amd64,linux/arm64,linux/arm/v7,linux/386
-      IMAGE_NAME: go-backend-template
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      IMAGE_NAME: ${{ github.repository }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -59,15 +59,14 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Login to Docker Hub
-        if: env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != ''
+      - name: Log in to GHCR
         uses: docker/login-action@v3
         with:
-          username: ${{ env.DOCKER_USERNAME }}
-          password: ${{ env.DOCKER_PASSWORD }}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push production image (Alpine)
-        if: env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != ''
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -75,8 +74,8 @@ jobs:
           push: true
           platforms: ${{ env.RELEASE_LINUX_PLATFORMS }}
           tags: |
-            docker.io/${{ env.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
-            docker.io/${{ env.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.TAG_NAME }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.tag.outputs.TAG_NAME }}
           provenance: false
           sbom: false
           cache-from: type=gha,scope=release
