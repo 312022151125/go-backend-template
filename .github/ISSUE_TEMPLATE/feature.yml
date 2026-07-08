@@ -1,21 +1,21 @@
-name: 功能请求
-description: 为该项目提出建议
+name: Feature request
+description: Suggest an improvement for this project
 title: "[Feature] "
 labels: ["enhancement"]
 body:
   - type: checkboxes
     id: ensure
     attributes:
-      label: 验证步骤
-      description: 在提交之前，请勾选以下选项以证明您已经阅读并理解了以下要求，否则该 issue 将被关闭。
+      label: Verification
+      description: Before submitting, check the options below to confirm you have read and understood these requirements; otherwise this issue may be closed.
       options:
-        - label: 我已经阅读了 README.md，确认了该功能没有实现
+        - label: I read README.md and confirmed this feature is not already implemented
           required: true
-        - label: 我已在 Issue 中寻找过我要提出的功能请求，并且没有找到
+        - label: I searched existing issues and did not find this feature request
           required: true
   - type: textarea
     attributes:
-      label: 描述
-      description: 请提供对于该功能的详细描述，而不是莫名其妙的话术。
+      label: Description
+      description: Provide a clear, detailed description of the feature (avoid vague wording).
     validations:
       required: true

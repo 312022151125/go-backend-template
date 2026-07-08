@@ -1,8 +1,8 @@
 package store
 
 import (
-	"go-backend-template/internal/conf"
-	"go-backend-template/internal/model"
+	"github.com/312022151125/go-backend-template/internal/conf"
+	"github.com/312022151125/go-backend-template/internal/model"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"

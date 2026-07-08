@@ -5,7 +5,7 @@ import (
 	"os"
 	"runtime"
 
-	"go-backend-template/internal/conf"
+	"github.com/312022151125/go-backend-template/internal/conf"
 
 	"github.com/spf13/cobra"
 )

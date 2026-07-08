@@ -7,7 +7,7 @@ import (
 
 func Cors() gin.HandlerFunc {
 	config := cors.DefaultConfig()
-	// 携带 cookie 的跨域响应不能使用 "*"，这里回显 Origin 以保留原本允许任意来源的行为。
+	// Credentialed cross-origin responses cannot use "*"; echo Origin to preserve prior allow-any-origin behavior.
 	config.AllowOriginFunc = func(origin string) bool {
 		return origin != ""
 	}

@@ -1,8 +1,8 @@
 # Go Backend Template
 
-这是一个单用户Go后端脚手架，用于快速构建Go后端项目。
+A single-user Go backend scaffold for quickly bootstrapping Go API projects.
 
-## 集成组件
+## Integrated components
 
 - [Gin](https://github.com/gin-gonic/gin)
 - [Viper](https://github.com/spf13/viper)
@@ -11,6 +11,6 @@
 - [SQLite](https://github.com/go-gorm/sqlite)
 - [CORS](https://github.com/gin-contrib/cors)
 - Cookie Auth
-- Static 
+- Static
 - Router
 - Shutdown

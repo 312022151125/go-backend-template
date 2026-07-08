@@ -3,8 +3,8 @@ package middleware
 import (
 	"net/http"
 
-	"go-backend-template/internal/server/resp"
-	"go-backend-template/internal/store"
+	"github.com/312022151125/go-backend-template/internal/server/resp"
+	"github.com/312022151125/go-backend-template/internal/store"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"

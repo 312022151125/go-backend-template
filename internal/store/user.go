@@ -7,13 +7,13 @@ import (
 	"time"
 
 	"github.com/charmbracelet/log"
-	"go-backend-template/internal/model"
+	"github.com/312022151125/go-backend-template/internal/model"
 	"gorm.io/gorm"
 )
 
 var (
 	userCache model.User
-	// 用户资料变更时推进版本号，用于让旧 cookie session 失效。
+	// Bump version when user credentials change so old cookie sessions are invalidated.
 	userAuthVersion atomic.Int64
 )
 

@@ -7,11 +7,11 @@ import (
 	"os/signal"
 	"syscall"
 
-	"go-backend-template/internal/conf"
-	_ "go-backend-template/internal/server/handlers"
-	"go-backend-template/internal/server/middleware"
-	"go-backend-template/internal/server/router"
-	"go-backend-template/internal/store"
+	"github.com/312022151125/go-backend-template/internal/conf"
+	_ "github.com/312022151125/go-backend-template/internal/server/handlers"
+	"github.com/312022151125/go-backend-template/internal/server/middleware"
+	"github.com/312022151125/go-backend-template/internal/server/router"
+	"github.com/312022151125/go-backend-template/internal/store"
 
 	"github.com/charmbracelet/log"
 	"github.com/gin-contrib/sessions"
@@ -81,7 +81,7 @@ var startCmd = &cobra.Command{
 
 		quit := make(chan os.Signal, 1)
 		signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
-		// 等 Ctrl+C，让命令正常返回，避免 Windows 默认中断退出码 0xc000013a。
+		// Block on Ctrl+C so the command exits cleanly instead of Windows exit code 0xc000013a.
 		<-quit
 	},
 }

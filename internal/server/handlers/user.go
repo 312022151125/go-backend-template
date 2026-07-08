@@ -4,11 +4,11 @@ import (
 	"net/http"
 	"time"
 
-	"go-backend-template/internal/model"
-	"go-backend-template/internal/server/middleware"
-	"go-backend-template/internal/server/resp"
-	"go-backend-template/internal/server/router"
-	"go-backend-template/internal/store"
+	"github.com/312022151125/go-backend-template/internal/model"
+	"github.com/312022151125/go-backend-template/internal/server/middleware"
+	"github.com/312022151125/go-backend-template/internal/server/resp"
+	"github.com/312022151125/go-backend-template/internal/server/router"
+	"github.com/312022151125/go-backend-template/internal/store"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
