@@ -25,7 +25,7 @@ The UI is a TanStack Start SPA in `web/`. Production assets are built into repo-
 
 ## Container images (GHCR)
 
-GitHub Actions push Alpine images to [GHCR](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry) as `ghcr.io/<owner>/<repo>:<tag>` (`IMAGE_NAME` = `${{ github.repository }}` in workflows):
+GitHub Actions push Alpine images to [GHCR](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry) as `ghcr.io/<owner>/<repo>:<tag>`:
 
 | Tag | When |
 |-----|------|
@@ -36,3 +36,17 @@ GitHub Actions push Alpine images to [GHCR](https://docs.github.com/en/packages/
 Example: `docker pull ghcr.io/312022151125/go-backend-template:develop`
 
 Uses `GITHUB_TOKEN` with `packages: write`. For private packages: `docker login ghcr.io` with a PAT (`read:packages`).
+
+## Docker Compose
+
+Root `compose.yml` runs the `:develop` image:
+
+```bash
+docker compose up -d
+```
+
+- **Port:** host `40000` → container `8080` (`http://127.0.0.1:40000/`)
+- **Volume:** `./data` → `/app/data` (SQLite + `config.json`)
+- **Env:** `GO_BACKEND_TEMPLATE_SERVER_HOST=0.0.0.0` (required so the app listens inside the container)
+
+If `data/config.json` is missing, a current build auto-creates it on first start. After the config fix, push to `develop` and pull a fresh `ghcr.io/312022151125/go-backend-template:develop` (or build the image locally from this repo).
