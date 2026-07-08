@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y ca-certificates tzdata gosu && \
     rm -rf /var/cache/apt/*  && \
     mkdir -p /app
 
-COPY build/docker/${TARGETPLATFORM}/example /app/example
+COPY build/docker/${TARGETPLATFORM}/go-backend-template /app/go-backend-template
 COPY scripts/dockerfile/entrypoint.sh /entrypoint.sh
 
 RUN chmod +x /entrypoint.sh

@@ -1,6 +1,6 @@
 package conf
 
 const (
-	APP_NAME = "example"
-	APP_DESC = "Example Service"
+	APP_NAME = "go-backend-template"
+	APP_DESC = "Go Backend Template"
 )

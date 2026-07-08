@@ -11,7 +11,7 @@ trap 'handle_error $? $LINENO' ERR
 # =============================================================================
 
 # Project configuration
-readonly APP_NAME="example"
+readonly APP_NAME="go-backend-template"
 readonly MAIN_DIR="./"
 readonly OUTPUT_DIR="build"
 
