@@ -11,7 +11,7 @@ trap 'handle_error $? $LINENO' ERR
 # =============================================================================
 
 # Project configuration
-readonly APP_NAME="Example"
+readonly APP_NAME="example"
 readonly MAIN_DIR="./"
 readonly OUTPUT_DIR="build"
 
@@ -364,8 +364,8 @@ show_usage() {
     echo ""
     echo "Commands:"
     echo "  release              Build all platforms and create distribution packages"
+    echo "  docker-binaries      Build Linux binaries for Docker (--platform linux/amd64, ...)"
     echo "  build <os> <arch>    Build for specific OS and architecture"
-    echo "  help                 Show this help message"
     echo ""
     echo "Supported OS:"
     echo "  linux, windows, darwin, android"
@@ -444,6 +444,66 @@ main() {
 
         log_step "Build completed"
         log_success "Binary ready: ${OUTPUT_DIR}/bin/${APP_NAME}-${os}-${arch}"
+        ;;
+    "docker-binaries")
+        local platforms=()
+        shift
+        while [ $# -gt 0 ]; do
+            case "$1" in
+            --platform)
+                if [ -z "${2:-}" ]; then
+                    log_error "docker-binaries: --platform requires a value (e.g. linux/amd64)"
+                    exit 1
+                fi
+                platforms+=("$2")
+                shift 2
+                ;;
+            *)
+                log_error "Unknown argument for docker-binaries: $1"
+                show_usage
+                exit 1
+                ;;
+            esac
+        done
+        if [ ${#platforms[@]} -eq 0 ]; then
+            platforms=("linux/amd64")
+        fi
+
+        log_step "Starting Docker binary build"
+        echo "📦 Building ${APP_NAME} ${GIT_VERSION} (${COMMIT_ID}) for Docker"
+        echo ""
+
+        if ! prepare_environment; then
+            log_error "Failed to prepare build environment"
+            exit 1
+        fi
+
+        log_step "Building Linux binaries for Docker"
+        local docker_arch
+        for docker_platform in "${platforms[@]}"; do
+            case "$docker_platform" in
+            linux/amd64) docker_arch=x86_64 ;;
+            linux/arm64) docker_arch=arm64 ;;
+            linux/arm/v7) docker_arch=armv7 ;;
+            linux/386) docker_arch=x86 ;;
+            *)
+                log_error "Unsupported Docker platform: ${docker_platform}"
+                exit 1
+                ;;
+            esac
+            if ! build_standard linux "$docker_arch"; then
+                log_error "Failed to build linux/${docker_arch} for ${docker_platform}"
+                exit 1
+            fi
+        done
+
+        if ! prepare_docker_binaries; then
+            log_error "Failed to prepare Docker binaries"
+            exit 1
+        fi
+
+        log_step "Docker binaries ready"
+        log_success "Artifacts in ${OUTPUT_DIR}/docker/"
         ;;
     "release")
         log_step "Starting release build"
