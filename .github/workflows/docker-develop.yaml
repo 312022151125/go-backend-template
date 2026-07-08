@@ -20,6 +20,8 @@ jobs:
       DOCKER_DEVELOP_PLATFORMS: linux/amd64
       GOFLAGS: -buildvcs=false
       IMAGE_NAME: go-backend-template
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -38,39 +40,30 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      - name: Check Docker Hub credentials
-        id: dockerhub
-        run: |
-          if [ -n "${{ secrets.DOCKER_USERNAME }}" ] && [ -n "${{ secrets.DOCKER_PASSWORD }}" ]; then
-            echo "configured=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "configured=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::DOCKER_USERNAME / DOCKER_PASSWORD not set — skipping registry push (test + binary build still run)."
-          fi
 
       - name: Login to Docker Hub
-        if: steps.dockerhub.outputs.configured == 'true'
+        if: env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != ''
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          username: ${{ env.DOCKER_USERNAME }}
+          password: ${{ env.DOCKER_PASSWORD }}
 
       - name: Build and push develop image (Alpine)
-        if: steps.dockerhub.outputs.configured == 'true'
+        if: env.DOCKER_USERNAME != '' && env.DOCKER_PASSWORD != ''
         uses: docker/build-push-action@v6
         with:
           context: .
           file: ./scripts/dockerfile/Dockerfile.alpine
           push: true
           platforms: ${{ env.DOCKER_DEVELOP_PLATFORMS }}
-          tags: docker.io/${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:develop
+          tags: docker.io/${{ env.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:develop
           provenance: false
           sbom: false
           cache-from: type=gha,scope=develop
           cache-to: type=gha,mode=max,scope=develop
 
       - name: Verify Docker image build (no push)
-        if: steps.dockerhub.outputs.configured != 'true'
+        if: env.DOCKER_USERNAME == '' || env.DOCKER_PASSWORD == ''
         uses: docker/build-push-action@v6
         with:
           context: .
