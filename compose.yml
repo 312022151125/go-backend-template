@@ -1,0 +1,9 @@
+services:
+  app:
+    image: ghcr.io/312022151125/go-backend-template:develop
+    container_name: go-backend-template
+    restart: unless-stopped
+    ports:
+      - "40000:8080"
+    volumes:
+      - ./data:/app/data

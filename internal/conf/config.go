@@ -1,8 +1,10 @@
 package conf
 
 import (
+	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/charmbracelet/log"
 	"github.com/spf13/viper"
@@ -47,16 +49,29 @@ func Load(path string) error {
 	if err := viper.ReadInConfig(); err == nil {
 		log.Infof("Using config file: %s", viper.ConfigFileUsed())
 	} else {
-		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
-			log.Infof("Config file not found, creating default config")
-			if err := os.MkdirAll("data", 0755); err != nil {
-				log.Errorf("Failed to create data directory: %v", err)
-			}
-			if err := viper.SafeWriteConfigAs("data/config.json"); err != nil {
-				log.Errorf("Failed to create default config: %v", err)
-			}
-		} else {
+		missing := false
+		var notFound viper.ConfigFileNotFoundError
+		if errors.As(err, &notFound) {
+			missing = true
+		} else if errors.Is(err, os.ErrNotExist) {
+			missing = true
+		}
+
+		if !missing {
 			return fmt.Errorf("error reading config file: %w", err)
+		}
+
+		outPath := path
+		if outPath == "" {
+			outPath = "data/config.json"
+		}
+
+		log.Infof("Config file not found, creating default at %s", outPath)
+		if err := os.MkdirAll(filepath.Dir(outPath), 0o755); err != nil {
+			return fmt.Errorf("failed to create config directory: %w", err)
+		}
+		if err := viper.SafeWriteConfigAs(outPath); err != nil {
+			return fmt.Errorf("failed to create default config: %w", err)
 		}
 	}
 
