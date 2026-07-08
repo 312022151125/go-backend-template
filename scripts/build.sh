@@ -515,8 +515,8 @@ main() {
             log_error "Failed to prepare build environment"
             exit 1
         fi
-        if ! command_exists npm; then
-            log_error "npm is required for release builds. Install Node.js or set SKIP_WEB_BUILD=1 to skip the web UI build."
+        if ! command_exists bun; then
+            log_error "bun is required for release builds. Install Bun or set SKIP_WEB_BUILD=1 to skip the web UI build."
             exit 1
         fi
         if [[ "${SKIP_WEB_BUILD:-}" != "1" ]]; then

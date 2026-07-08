@@ -6,7 +6,7 @@ CLIENT_DIR="${ROOT}/web/dist/client"
 STATIC_DIR="${ROOT}/static"
 
 if [[ ! -d "${CLIENT_DIR}" ]]; then
-  echo "error: ${CLIENT_DIR} not found. Run: cd web && npm run build" >&2
+  echo "error: ${CLIENT_DIR} not found. Run: cd web && bun run build" >&2
   exit 1
 fi
 
