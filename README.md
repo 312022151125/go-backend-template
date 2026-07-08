@@ -8,7 +8,7 @@ A single-user Go backend scaffold for quickly bootstrapping Go API projects.
 - [Viper](https://github.com/spf13/viper)
 - [Cobra](https://github.com/spf13/cobra)
 - [Charmbracelet/log](https://github.com/charmbracelet/log)
-- [SQLite](https://github.com/go-gorm/sqlite)
+- [SQLite (pure Go)](https://github.com/glebarez/sqlite) via GORM
 - [CORS](https://github.com/gin-contrib/cors)
 - Cookie Auth
 - Static
