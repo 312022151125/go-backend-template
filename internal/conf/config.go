@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/charmbracelet/log"
 	"github.com/spf13/viper"
@@ -43,6 +44,14 @@ func Load(path string) error {
 
 	viper.AutomaticEnv()
 	viper.SetEnvPrefix(APP_NAME)
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_", "-", "_"))
+
+	if err := viper.BindEnv("server.host", "SERVER_HOST"); err != nil {
+		return err
+	}
+	if err := viper.BindEnv("server.port", "SERVER_PORT"); err != nil {
+		return err
+	}
 
 	setDefaults()
 
@@ -77,6 +86,12 @@ func Load(path string) error {
 
 	if err := viper.Unmarshal(&AppConfig); err != nil {
 		return fmt.Errorf("unable to decode config into struct: %w", err)
+	}
+	if h := viper.GetString("server.host"); h != "" {
+		AppConfig.Server.Host = h
+	}
+	if viper.IsSet("server.port") {
+		AppConfig.Server.Port = viper.GetInt("server.port")
 	}
 	if level, err := log.ParseLevel(AppConfig.Log.Level); err == nil {
 		log.SetLevel(level)
